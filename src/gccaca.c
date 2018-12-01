@@ -7,10 +7,8 @@
  Description : Hello World in C, Ansi-style
  ============================================================================
  */
-// XXX: http://acm.hdu.edu.cn/showproblem.php?pid=1695
 #if 1
 #define _GNU_SOURCE
-//#define _XOPEN_SOURCE 700
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -60,8 +58,7 @@
 
 #define CACA_COMUN_VALOR_INVALIDO ((tipo_dato)UINT_MAX)
 #define CACA_COMUN_IDX_INVALIDO ((natural)CACA_COMUN_VALOR_INVALIDO)
-//#define CACA_COMUN_LOG
-#define CACA_COMUN_FUNC_STATICA static inline
+#define CACA_COMUN_FUNC_STATICA static
 
 typedef char byteme;
 typedef unsigned int natural;
@@ -158,7 +155,7 @@ CACA_COMUN_FUNC_STATICA void caca_comun_timestamp(char *stime) {
 	strcat(stime, parte_milisecundos);
 }
 
-#endif // ONLINE_JUDGE
+#endif
 #ifdef CACA_COMUN_LOG
 void caca_log_debug_func(const char *format, ...) {
 
@@ -382,7 +379,6 @@ CACA_COMUN_FUNC_STATICA natural caca_comun_max_natural(natural *nums,
 	return max;
 }
 
-// XXX: https://stackoverflow.com/questions/122616/how-do-i-trim-leading-trailing-whitespace-in-a-standard-way?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 CACA_COMUN_FUNC_STATICA char *caca_comun_trimea(char *cad, natural cad_tam) {
 	char c = cad[0];
 	char tmp = '\0';
@@ -460,7 +456,8 @@ CACA_COMUN_FUNC_STATICA void caca_comun_invierte_arreglo_natural(natural *a,
 CACA_COMUN_FUNC_STATICA natural caca_comun_encuentra_minimo_natural(natural *a,
 		natural a_tam) {
 	natural min = CACA_COMUN_VALOR_INVALIDO;
-	for (natural i = 0; i < a_tam; i++) {
+	natural i;
+	for (i = 0; i < a_tam; i++) {
 		if (min > a[i]) {
 			min = a[i];
 		}
@@ -513,20 +510,18 @@ CACA_COMUN_FUNC_STATICA natural primos_caca_criba(natural limite,
 		void *cb_ctx) {
 	caca_log_debug("primos asta %u", limite);
 	assert_timeout(limite<=PRIMOS_CACA_MAX);
-	for (natural i = 2; i <= limite; i++) {
+	natural i, j;
+	for (i = 2; i <= limite; i++) {
 		primos_caca_es_primo[i] = verdadero;
 	}
-	for (natural i = 2; i <= limite; i++) {
+	for (i = 2; i <= limite; i++) {
 		if (primos_caca_es_primo[i]) {
-//			caca_log_debug("el %u es primo", i);
 			primos_caca[primos_caca_tam++] = i;
-//			deltas[i] = i - 1;
 			if (primo_cb) {
 				primo_cb(i, primos_caca_tam - 1, cb_ctx);
 			}
 		}
-		for (natural j = 0; j < primos_caca_tam && primos_caca[j] * i <= limite;
-				j++) {
+		for (j = 0; j < primos_caca_tam && primos_caca[j] * i <= limite; j++) {
 			primos_caca_es_primo[primos_caca[j] * i] = falso;
 			if (compuesto_cb) {
 				compuesto_cb(primos_caca[j], j, i, cb_ctx);
@@ -542,7 +537,6 @@ CACA_COMUN_FUNC_STATICA natural primos_caca_criba(natural limite,
 				}
 			}
 		}
-//		num_elems[i] = num_elems[i - 1] + deltas[i];
 	}
 	caca_log_debug("generados %u primos", primos_caca_tam);
 	return primos_caca_tam;
@@ -585,8 +579,9 @@ CACA_COMUN_FUNC_STATICA natural gccaca_calcula_parejas_de_mcd(natural a,
 	natural d_lim_min = caca_comun_min(d_lim_a, d_lim_b);
 	natural *morbuius = g->morbius;
 	natural r = 0;
+	natural d;
 
-	for (natural d = 1; d <= d_lim_min; d++) {
+	for (d = 1; d <= d_lim_min; d++) {
 		natural xa = a / (k * d);
 		natural xb = b / (k * d);
 		r += morbuius[d] * xa * xb;
@@ -614,9 +609,13 @@ CACA_COMUN_FUNC_STATICA void gccaca_main() {
 	g->morbius = morbius;
 	primos_caca_criba(MAX_MIERDA, primo_encontrado, NULL, divisible_encontrado,
 			no_divisible_encontrado, g);
-	for (natural i = 0; i < n; i++) {
+	natural i;
+	for (i = 0; i < n; i++) {
 		scanf("%u %u %u %u %u\n", &a, &b, &c, &d, &k);
-		natural r = gccaca_core(b, d, k, g);
+		natural r = 0;
+		if (k) {
+			natural r = gccaca_core(b, d, k, g);
+		}
 		printf("Case %u: %u\n", i + 1, r);
 	}
 }
