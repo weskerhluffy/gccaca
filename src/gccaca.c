@@ -7,6 +7,11 @@
  Description : Hello World in C, Ansi-style
  ============================================================================
  */
+// XXX: http://acm.hdu.edu.cn/showproblem.php?pid=1695
+// XXX: http://mathworld.wolfram.com/MoebiusFunction.html
+// XXX: https://www.quora.com/profile/Surya-Kiran/Posts/A-Dance-with-Mobius-Function
+// XXX: https://blog.csdn.net/sr_19930829/article/details/44965575
+// XXX: https://blog.csdn.net/qingshui23/article/details/52218121
 #if 1
 #define _GNU_SOURCE
 #include <stdio.h>
@@ -546,10 +551,10 @@ CACA_COMUN_FUNC_STATICA natural primos_caca_criba(natural limite,
 
 #define MAX_MIERDA ((int)1E5)
 
-natural morbius[MAX_MIERDA + 1] = { [1]=1 };
+int morbius[MAX_MIERDA + 1] = { [1]=1 };
 
 typedef struct gccaca_datos {
-	natural *morbius;
+	int *morbius;
 } gccaca_datos;
 
 void divisible_encontrado(natural primo, natural idx_primo, natural compuesto,
@@ -572,19 +577,19 @@ void primo_encontrado(natural primo, natural idx_primo, void *cb_ctx) {
 	g->morbius[primo] = -1;
 }
 
-CACA_COMUN_FUNC_STATICA natural gccaca_calcula_parejas_de_mcd(natural a,
+CACA_COMUN_FUNC_STATICA entero_largo gccaca_calcula_parejas_de_mcd(natural a,
 		natural b, natural k, gccaca_datos *g) {
 	natural d_lim_a = a / k;
 	natural d_lim_b = b / k;
 	natural d_lim_min = caca_comun_min(d_lim_a, d_lim_b);
-	natural *morbuius = g->morbius;
-	natural r = 0;
+	int *morbuius = g->morbius;
+	entero_largo r = 0;
 	natural d;
 
 	for (d = 1; d <= d_lim_min; d++) {
 		natural xa = a / (k * d);
 		natural xb = b / (k * d);
-		r += morbuius[d] * xa * xb;
+		r += (entero_largo) morbuius[d] * (entero_largo) xa * (entero_largo) xb;
 		caca_log_debug("morbius %u = %u", d, morbuius[d]);
 	}
 	return r;
@@ -593,12 +598,28 @@ CACA_COMUN_FUNC_STATICA natural gccaca_calcula_parejas_de_mcd(natural a,
 CACA_COMUN_FUNC_STATICA natural gccaca_core(natural lim_1, natural lim_2,
 		natural k, gccaca_datos *g) {
 	natural lim_min = caca_comun_min(lim_1, lim_2);
-	natural max_parejas = gccaca_calcula_parejas_de_mcd(lim_1, lim_2, k, g);
-	natural min_parejas = gccaca_calcula_parejas_de_mcd(lim_min, lim_min, k, g);
-	natural min_parejas_mitad = min_parejas >> 1;
-	natural r = max_parejas - min_parejas_mitad;
-	caca_log_debug("lim1 %u lim2 %u k %u min par %u max par %u r %u", lim_1,
-			lim_2, k, min_parejas, max_parejas, r);
+	entero_largo max_parejas = gccaca_calcula_parejas_de_mcd(lim_1, lim_2, k,
+			g);
+	entero_largo min_parejas = gccaca_calcula_parejas_de_mcd(lim_min, lim_min,
+			k, g);
+	entero_largo min_parejas_mitad = min_parejas >> 1;
+	entero_largo r = max_parejas - min_parejas_mitad;
+	caca_log_debug("lim1 %u lim2 %u k %u min par %llu max par %llu r %llu",
+			lim_1, lim_2, k, min_parejas, max_parejas, r);
+	return r;
+}
+
+CACA_COMUN_FUNC_STATICA entero_largo gccaca_fuerza_bruta(natural lim_1,
+		natural lim_2, natural k) {
+	natural i, j;
+	entero_largo r = 0;
+	for (i = 1; i <= lim_1; i++) {
+		for (j = i; j <= lim_2; j++) {
+			if (caca_comun_mcd(i, j) == k) {
+				r++;
+			}
+		}
+	}
 	return r;
 }
 
@@ -612,11 +633,15 @@ CACA_COMUN_FUNC_STATICA void gccaca_main() {
 	natural i;
 	for (i = 0; i < n; i++) {
 		scanf("%u %u %u %u %u\n", &a, &b, &c, &d, &k);
-		natural r = 0;
+		entero_largo r = 0;
 		if (k) {
-			natural r = gccaca_core(b, d, k, g);
+			r = gccaca_core(b, d, k, g);
+			/*
+			entero_largo r1 = gccaca_fuerza_bruta(b, d, k);
+			assert_timeout(r == r1);
+			*/
 		}
-		printf("Case %u: %u\n", i + 1, r);
+		printf("Case %u: %I64d\n", i + 1, r);
 	}
 }
 
